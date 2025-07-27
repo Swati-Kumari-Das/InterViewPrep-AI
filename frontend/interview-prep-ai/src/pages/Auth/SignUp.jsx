@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../../components/Inputs/Input';
+import ProfilePhotoSelector from '../../components/Inputs/ProfilePhotoSelector';
+import { validateEmail } from '../../utils/helper';
+
 const SignUp = ({ setCurrentPage }) => {
     const [profilePic, setProfilePic] = useState(null);
     const [fullName, setFullName] = useState("");
@@ -14,6 +17,28 @@ const SignUp = ({ setCurrentPage }) => {
     const handleSignUp = async (e) => {
         e.preventDefault();
         // Add signup logic here
+        if(!fullName){
+          setError("Please enter Full Name.");
+          return;
+        }
+        if(!validateEmail(email)){
+          setError("Please enter a valid email address.");
+          return;
+        }
+        if(!password){
+          setError("Please enter the password");
+          return;
+        }
+        setError("");
+        try{
+
+        }catch(error){
+          if(error.response && error.response.data.message){
+            setError(error.response.data.message);
+          }else{
+            setError("Something went wrong.Please try again.")
+          }
+        }
     };
 
     return (
@@ -24,6 +49,7 @@ const SignUp = ({ setCurrentPage }) => {
             </p>
 
             <form onSubmit={handleSignUp}>
+              <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} />
                 <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
                     <Input
                         value={fullName}
