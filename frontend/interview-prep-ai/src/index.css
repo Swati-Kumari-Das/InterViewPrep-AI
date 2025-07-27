@@ -82,8 +82,12 @@
   @apply w-full flex justify-between gap-3 text-sm text-black bg-gray-50/50 rounded px-4 py-3 mb-4 mt-3 border;
 }
 
-.btn-primary {
+/* .btn-primary {
   @apply w-full flex items-center justify-center gap-3 text-sm font-medium text-white bg-black shadow-lg;
+} */
+
+.btn-primary {
+  @apply w-full flex items-center justify-center gap-3 text-sm font-medium text-white bg-black shadow-lg py-2.5 px-4 rounded-lg hover:bg-gray-800 transition;
 }
 
 .btn-small {
