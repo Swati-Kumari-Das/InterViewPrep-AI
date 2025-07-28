@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../../components/Inputs/Input';
 import ProfilePhotoSelector from '../../components/Inputs/ProfilePhotoSelector';
 import { validateEmail } from '../../utils/helper';
-
+import { UserContext } from '../../context/userContext';
+import axiosInstance from '../../utils/axiosInstance';
+import { API_PATHS } from '../../utils/apiPaths';
+import { useContext } from 'react';
 const SignUp = ({ setCurrentPage }) => {
     const [profilePic, setProfilePic] = useState(null);
     const [fullName, setFullName] = useState("");
@@ -11,6 +14,7 @@ const SignUp = ({ setCurrentPage }) => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
 
+    const { updateUser }=useContext(UserContext);
     const navigate = useNavigate();
 
     // Handle SignUp Form Submit
@@ -30,14 +34,37 @@ const SignUp = ({ setCurrentPage }) => {
           return;
         }
         setError("");
-        try{
 
-        }catch(error){
-          if(error.response && error.response.data.message){
-            setError(error.response.data.message);
-          }else{
-            setError("Something went wrong.Please try again.")
-          }
+        //SignUp API Call
+
+        try{
+            if (profilePic) {
+            const imgUploadRes = await uploadImage(profilePic);
+            profileImageUrl = imgUploadRes.imageUrl || "";  // Fixed typo: imagelr1 → imageUrl
+        }
+        
+        const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {  // Fixed typo: API_PATMS → API_PATHS
+            name: fullName,
+            email,
+            password,
+            profileImageUrl,  // Fixed typo: profileImagelr1 → profileImageUrl
+        });
+        
+        const { token } = response.data;
+
+      if (token) {
+          localStorage.setItem("token", token);
+          updateUser(response.data);  // Make sure to pass user data
+          navigate("/dashboard");
+          toast.success("Registration successful!");  // Optional success notification
+      }
+      
+      }catch(error){
+                if(error.response && error.response.data.message){
+                  setError(error.response.data.message);
+                }else{
+                  setError("Something went wrong.Please try again.")
+                }
         }
     };
 
