@@ -7,6 +7,9 @@ import { UserContext } from '../../context/userContext';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { useContext } from 'react';
+import { toast } from "react-hot-toast";
+import uploadImage from '../../utils/uploadImage';
+
 const SignUp = ({ setCurrentPage }) => {
     const [profilePic, setProfilePic] = useState(null);
     const [fullName, setFullName] = useState("");
@@ -38,16 +41,17 @@ const SignUp = ({ setCurrentPage }) => {
         //SignUp API Call
 
         try{
+            let profileImageUrl = ""; 
             if (profilePic) {
             const imgUploadRes = await uploadImage(profilePic);
-            profileImageUrl = imgUploadRes.imageUrl || "";  // Fixed typo: imagelr1 → imageUrl
+            profileImageUrl = imgUploadRes.imageUrl || "";  
         }
         
-        const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {  // Fixed typo: API_PATMS → API_PATHS
+        const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {  
             name: fullName,
             email,
             password,
-            profileImageUrl,  // Fixed typo: profileImagelr1 → profileImageUrl
+            profileImageUrl, 
         });
         
         const { token } = response.data;

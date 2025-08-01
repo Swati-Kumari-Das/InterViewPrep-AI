@@ -46,9 +46,11 @@ const CreateSessionForm = () => {
                 }
             )
             //Should be ARRAY LIKE [{QUESTION,ANSWER},...]
+            const generatedQuestions=aiResponse.data;
+            
             const response=await axiosInstance.post(API_PATHS.SESSION.CREATE,{
                 ...formData,
-                questions: generatedQuestion,
+                questions: generatedQuestions,
             });
             if(response.data?.session?._id){
                 navigate(`/interview-prep/${response.data?.session?._id}`);
@@ -56,7 +58,9 @@ const CreateSessionForm = () => {
 
         }catch (error){
             if(error.response && error.response.data.message){
-                setError("Something went wrong. Please try again.");
+                setError(error.response.data.message);
+            }else{
+                setError("Something went wrong. Please try again."); 
             }
         }finally{
             setIsLoading(false);
@@ -79,7 +83,7 @@ const CreateSessionForm = () => {
                         label="Target role"
                         placeholder="e.g., Frontend Developer, UI/UX Designer, etc."
                         type="text"
-                        className="w-full p-2 border rounded"
+                        
                         required
                     />
               
@@ -88,25 +92,25 @@ const CreateSessionForm = () => {
                     <Input
                         value={formData.experience}
                         onChange={({ target }) => handleChange("experience", target.value)}
+                        label="Years of Experience"
                         placeholder="e.g., 1 year, 3 years, 5+ years"
                         type="number"
-                        className="w-full p-2 border rounded"
+                       
                         required
                     />
           
 
-                <div className="form-group">
-                    <label className="block text-sm font-medium mb-1">Topics to Focus On</label>
-                    <input
+                
+                    <Input
                         value={formData.topicsToFocus}
                         onChange={({ target }) => handleChange("topicsToFocus", target.value)}
-                        labels="Topics to Focus On"
+                        label="Topics to Focus On"
                         placeholder="Comma-separated, e.g., React, Node.js, MongoDB"
                         type="text"
-                        className="w-full p-2 border rounded"
+                       
                         required
                     />
-                </div>
+            
 
                
                     <Input
@@ -126,7 +130,15 @@ const CreateSessionForm = () => {
                     className="btn-primary w-full mt-2"
                     disabled={isLoading}
                 >
-                {!isLoading && <SpinnerLoader /> }Create Session
+              {/* {isLoading && <SpinnerLoader />} Create Session */}
+              {isLoading ? (
+  <>
+    <SpinnerLoader />
+    <span>Creating...</span>
+  </>
+) : (
+  <span>Create Session</span>
+)}
                 </button>
             </form>
         </div>

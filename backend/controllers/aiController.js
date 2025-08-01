@@ -12,8 +12,6 @@ const ai = new GoogleGenAI({apiKey:process.env.GENAI_API_KEY}); // Fixed env var
  * @access  Private
  */
 const generateInterviewQuestions = async (req, res) => {
-  
-      
       try {
         const { role, experience, topicsToFocus, numberOfQuestions } = req.body;
 
@@ -30,11 +28,11 @@ const generateInterviewQuestions = async (req, res) => {
             model:"gemini-2.0-flash-lite",
             contents:prompt,
         });
-        const rawText = response.text();
+        const rawText = response.text;
 
         // Clean response text
         const cleanedText = rawText
-            .replace(/^```json/, "")  // Remove starting ```json
+            .replace(/^```json\s*/, "")  // Remove starting ```json
             .replace(/```$/, "")      // Remove ending ```
             .trim();                  // Remove extra spaces
 
@@ -53,6 +51,9 @@ const generateInterviewQuestions = async (req, res) => {
         });
     }
 };
+
+
+
 
 /**
  * @desc    Generate explanation for an interview concept
@@ -80,7 +81,7 @@ const generateConceptExplanation = async (req, res) => {
 
         // Clean response text
         const cleanedText = rawText
-            .replace(/^```json/, "")  // Remove starting ```json
+            .replace(/^```json\s*/, "")  // Remove starting ```json
             .replace(/```$/, "")      // Remove ending ```
             .trim();                  // Remove extra spaces
 
@@ -92,7 +93,6 @@ const generateConceptExplanation = async (req, res) => {
 
 
     } catch (error) {
-        console.error("Explanation generation error:", error);
         res.status(500).json({
             success: false,
             message: "Failed to generate explanation",

@@ -8,6 +8,7 @@ import Login from './Auth/Login';
 import SignUp from './Auth/SignUp';
 import { useContext } from 'react';
 import { UserContext } from '../context/userContext';
+import ProfileInfoCard from '../components/Cards/ProfileInfoCard';
 
 const LandingPage = () => {
      

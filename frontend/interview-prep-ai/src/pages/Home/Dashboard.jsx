@@ -8,6 +8,10 @@ import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import moment from 'moment';
 import CreateSessionForm from './CreateSessionForm';
+import DeleteAlertContent from '../../components/DeleteAlertContent';
+import Modal from '../../components/Modal'; // adjust the path as needed
+import SummaryCard from '../../components/Cards/SummaryCard';
+
 const Dashboard = () => {
     const navigate = useNavigate();
 
@@ -29,8 +33,20 @@ const Dashboard = () => {
     };
 
     const deleteSession = async (sessionData) => {
-
-    };
+    try {
+        await axiosInstance.delete(API_PATHS.SESSION.DELETE(sessionData?._id));
+        
+        toast.success("Session deleted successfully!");
+        setOpenDeleteAlert({
+            open: false,
+            data: null,
+        });
+        fetchAllSessions();
+    } catch (error) {
+        console.error("Error deleting session:", error);
+       
+    }
+   };
     
 
     useEffect(() => {
@@ -41,15 +57,15 @@ const Dashboard = () => {
         <>
         <DashboardLayout>
        <div className="container mx-auto pt-4 pb-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-7 pt-1 pb-6 px-4 md:px-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-7 pt-1 pb-6 px-4 ">
          {sessions?.map((data, index) => (
          <SummaryCard
         key={data?._id}
         colors={CARD_BG[index % CARD_BG.length]}
         role={data?.role || ""}
         topicsToFocus={data?.topicsToFocus || ""}
-        experience={data?.experience || "--"}
-        questions={data?.questions?.length || "--"}
+        experience={data?.experience || "-"}
+        questions={data?.questions?.length || "-"}
         description={data?.description || ""}
         lastUpdated={
             data?.updatedAt
@@ -80,11 +96,28 @@ const Dashboard = () => {
      }}
      hideHeader
      >
-
-    </Modal>
-    <div>
+    
+     <div>
         <CreateSessionForm/>
     </div>
+
+    </Modal>
+
+    <Modal
+    isOpen={openDeleteAlert?.open}
+    onClose={() => {
+        setOpenDeleteAlert({ open: false, data: null });
+    }}
+    title="Delete Alert"
+>
+    <div className="w-[300px]">
+        <DeleteAlertContent
+            content="Are you sure you want to delete this session detail?"
+            onDelete={() => deleteSession(openDeleteAlert.data)}
+        />
+    </div>
+    </Modal>
+   
     </DashboardLayout>
     </>
   

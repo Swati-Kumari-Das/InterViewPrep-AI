@@ -16,7 +16,7 @@ const app = express();
 // Middleware to handle CORS
 app.use(
     cors({
-        origin: "e",
+        origin: "http://localhost:5173",
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
     })
@@ -43,5 +43,5 @@ app.use("/api/ai/generate-explanation", protect, generateConceptExplanation);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Start Server
-const PORT = process.env.PORT || 5888;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
