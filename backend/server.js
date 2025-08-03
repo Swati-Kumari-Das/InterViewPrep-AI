@@ -9,11 +9,11 @@ const authRoutes=require('./routes/authRoutes')
 const sessionRoutes=require('./routes/sessionRoutes')
 const questionRoutes=require('./routes/questionRoutes')
 const {protect}=require("./middlewares/authMiddleware");
-const allowedOrigin = process.env.ALLOWED_ORIGIN;
+
 const {generateInterviewQuestions,generateConceptExplanation}=require("./controllers/aiController");
 
 const app = express();
-
+const allowedOrigin = process.env.ALLOWED_ORIGIN;
 // Middleware to handle CORS
 app.use(
     cors({
@@ -41,7 +41,7 @@ app.use("/api/ai/generate-explanation", protect, generateConceptExplanation);
 
 
 // Serve uploads folder
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+//app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Start Server
 const PORT = process.env.PORT || 8000;
