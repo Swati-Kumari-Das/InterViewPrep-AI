@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-
+import { useState } from 'react';
 const AIResponsePreview = ({ content }) => {
     if (!content) return null;
     
@@ -17,7 +17,7 @@ const AIResponsePreview = ({ content }) => {
                         code({ node, className, children, ...props }) {
                         const match = /language-(\w+)/.exec(className || '');
                        const language = match ? match[1] : '';
-                  const isInline = !className || className.includes('inline');
+                  const isInline = !className;
           
                   return isInline ? (
                       <code className="px-1 py-0.5 bg-gray-100 rounded text-sm" {...props}>

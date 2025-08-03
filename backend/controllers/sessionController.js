@@ -62,7 +62,9 @@ exports.getMySessions = async (req, res) => {
         const sessions = await Session.find({ user: req.user._id })
             .sort({ createdAt: -1 })
             .populate('questions');
-        res.status(200).json(sessions);
+         res.status(200).json(sessions);
+       // res.status(200).json({ success: true, sessions });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ 
@@ -100,10 +102,8 @@ exports.getSessionById = async (req, res) => {
         }
 
     
-        res.status(200).json({ 
-            success: true, 
-            data: session  // Consider renaming to 'data' for consistency
-        });
+        res.status(200).json({ success: true, session });
+
 
     } catch (error) {
         console.error(error);

@@ -13,19 +13,17 @@ import { API_PATHS } from '../../utils/apiPaths';
 import QuestionCard from '../../components/Cards/QuestionCard';
 import Drawer from '../../components/Drawer';
 import SkeletonLoader from '../../components/Loader/SkeletonLoader';
+import AIResponsePreview from './components/AIResponsePreview';
 const InterviewPrep = () => {
     const { sessionId } = useParams();
-
     const [sessionData, setSessionData] = useState(null);
     const [errorMsg, setErrorMsg] = useState("");
+    const [error, setError] = useState(null); // ✅ Add this
 
     const [openLearnMoreDrawer, setOpenLearnMoreDrawer] = useState(false);
     const [explanation, setExplanation] = useState(null);
-
     const [isLoading, setIsLoading] = useState(false);
     const [isUpdateLoader, setIsUpdateLoader] = useState(false);
-   
-
     // Fetch session data by session id
     const fetchSessionDetailsById = async () => {
         setIsLoading(true);
@@ -61,24 +59,45 @@ const InterviewPrep = () => {
         if (response.data) {
             setExplanation(response.data);
         }
-    } catch (error) {
-        setExplanation(null);
+    } 
+    
+    // catch (error) {
+    //     setExplanation(null);
+    //     setErrorMsg("Failed to generate explanation. Try again later.");
+    //     console.error("Error:", error);
+    // }
+    
+    
+    catch (error) {
+    setExplanation(null);
+
+    const serverMsg = error?.response?.data?.error || "";
+    const isOverloaded = serverMsg.includes("overloaded") || serverMsg.includes("UNAVAILABLE");
+
+    if (isOverloaded) {
+        setErrorMsg("The AI model is currently overloaded. Please try again later.");
+    } else {
         setErrorMsg("Failed to generate explanation. Try again later.");
-        console.error("Error:", error);
-    } finally {
+    }
+
+    console.error("Backend responded with error:", error?.response?.data);
+}
+
+    
+    finally {
         setIsLoading(false);
     }
 };
      
     const toggleQuestionPinStatus = async (questionId) => {
     try {
-        const response = await axiosInstance.post(
+        const response = await axiosInstance.patch(
             API_PATHS.QUESTION.PIN(questionId)
         );
         
         console.log(response);
         
-        if (response.data?.question) {
+        if (response.data && response.data.question) {
             // toast.success('Question pinned successfully!');
             fetchSessionDetailsById();
         }
@@ -91,8 +110,17 @@ const InterviewPrep = () => {
     // Add more questions to a session
 const uploadMoreQuestions = async () => {
     try {
+        console.log("⏳ Starting uploadMoreQuestions...");
         setIsUpdateLoader(true);
-        setError(null); // Clear previous errors
+       // setError(null); // Clear previous errors
+       
+         // Log the session data being sent
+        console.log("📦 Sending to AI API:", {
+            role: sessionData?.role,
+            experience: sessionData?.experience,
+            topicsToFocus: sessionData?.topicsToFocus,
+            numberOfQuestions: 10,
+        });
 
         // Call AI API to generate questions
         const aiResponse = await axiosInstance.post(
@@ -105,9 +133,15 @@ const uploadMoreQuestions = async () => {
             }
         );
 
+        console.log("✅ AI response:", aiResponse.data);
+
         // Should be array like [{question, answer}, ...]
         const generatedQuestions = aiResponse.data;
 
+         console.log("📩 Sending questions to ADD_TO_SESSION API:", {
+            sessionId,
+            questions: generatedQuestions,
+        });
         const response = await axiosInstance.post(
             API_PATHS.QUESTION.ADD_TO_SESSION,
             {
@@ -115,18 +149,23 @@ const uploadMoreQuestions = async () => {
                 questions: generatedQuestions,
             }
         );
+        console.log("✅ Session update response:", response.data);
 
         if (response.data) {
             toast.success("Added More Q&A!");
             fetchSessionDetailsById();
         }
     } catch (error) {
+        console.error("❌ uploadMoreQuestions failed:", error);
         if (error.response && error.response.data.message) {
+             console.error("❌ Error Response Data:", error.response.data);
             setError(error.response.data.message);
         } else {
+             console.error("❌ Unknown Error:", error.message);
             setError("Something went wrong. Please try again.");
         }
     } finally {
+         console.log("✅ Finished uploadMoreQuestions");
         setIsUpdateLoader(false);
     }
 };
@@ -151,10 +190,10 @@ const uploadMoreQuestions = async () => {
                 : ""
         }
     />
-   <div className="container mx-auto pt-4 pb-4 px-4 md:px-0">
+   <div className="container mx-auto  pt-4 pb-4 px-4 ">
    <h2 className="text-lg font-semibold color-black">Interview Q & A</h2>
   
-    <div className="gird grid-cols-12 gap-4 mt-5 mb-10">
+    <div className="grid grid-cols-12 gap-4 mt-5 mb-10">
     <div
       className={`col-span-12 ${
         openLearnMoreDrawer ? "md:col-span-7" : "md:col-span-8"
@@ -175,7 +214,7 @@ const uploadMoreQuestions = async () => {
                 delay: index * 0.1,
                 damping: 15,
               }}
-              layout
+              layout //this is the key prop that animates position changes
               layoutId={`question-${data._id || index}`} // Helps Framer track
             >
               <>

@@ -67,7 +67,7 @@ const generateConceptExplanation = async (req, res) => {
         if (!question) {
             return res.status(400).json({ 
                 
-                message: "Missing required feilds" 
+                message: "Missing required fields" 
             });
         }
 
@@ -92,13 +92,29 @@ const generateConceptExplanation = async (req, res) => {
         res.status(200).json(data);
 
 
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Failed to generate explanation",
-            error: error.message
-        });
-    }
+    } 
+    
+    // catch (error) {
+    //     res.status(500).json({
+    //         success: false,
+    //         message: "Failed to generate explanation",
+    //         error: error.message
+    //     });
+    // }
+    catch (error) {
+    const errMsg = error?.message || "Unknown Error";
+    const geminiMsg = error?.error?.message || "";
+
+    //console.error("Gemini error:", geminiMsg || errMsg);
+
+    res.status(500).json({
+        success: false,
+        message: "Failed to generate explanation",
+        error: geminiMsg || errMsg
+    });
+}
+
+
 };
 
 module.exports = { generateInterviewQuestions, generateConceptExplanation };

@@ -78,7 +78,7 @@ exports.togglePinQuestion = async (req, res) => {
           }
           question.isPinned=!question.isPinned;
           await question.save();
-        res.status(500).json({message:"Server Error"});
+          res.status(200).json({ success: true, question }); 
     } catch (error) {
         
         res.status(500).json({
