@@ -9,6 +9,7 @@ const authRoutes=require('./routes/authRoutes')
 const sessionRoutes=require('./routes/sessionRoutes')
 const questionRoutes=require('./routes/questionRoutes')
 const {protect}=require("./middlewares/authMiddleware");
+const allowedOrigin = process.env.ALLOWED_ORIGIN;
 const {generateInterviewQuestions,generateConceptExplanation}=require("./controllers/aiController");
 
 const app = express();
@@ -16,7 +17,7 @@ const app = express();
 // Middleware to handle CORS
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: allowedOrigin,
         methods: ["GET", "POST", "PUT","PATCH", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
     })
